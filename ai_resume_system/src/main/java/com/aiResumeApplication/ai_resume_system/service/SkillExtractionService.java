@@ -1,12 +1,15 @@
 package com.aiResumeApplication.ai_resume_system.service;
 
 import org.springframework.stereotype.Service;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class SkillExtractionService {
 
+    // Predefined skills
     private static final List<String> PREDEFINED_SKILLS = Arrays.asList(
 
             // Programming Languages
@@ -23,9 +26,10 @@ public class SkillExtractionService {
             "React",
             "Angular",
             "Vue",
+            "Bootstrap",
+            "Tailwind CSS",
 
             // Backend
-            "Spring",
             "Spring Boot",
             "Hibernate",
             "JPA",
@@ -50,37 +54,71 @@ public class SkillExtractionService {
             "Azure",
             "GCP",
 
-            // Concepts
+            // APIs
             "REST API",
+
+            // Concepts
             "Microservices",
             "OOP",
             "DSA",
             "JWT"
-
     );
 
+    // Skill aliases
+    private static final Map<String, String> SKILL_ALIASES = Map.ofEntries(
+
+            Map.entry("springboot", "Spring Boot"),
+            Map.entry("spring boot", "Spring Boot"),
+
+            Map.entry("reactjs", "React"),
+            Map.entry("react.js", "React"),
+
+            Map.entry("nodejs", "Node.js"),
+
+            Map.entry("js", "JavaScript"),
+
+            Map.entry("mysql database", "MySQL"),
+
+            Map.entry("restful api", "REST API")
+    );
+
+    // Normalize text
+    private String normalizeText(String text) {
+
+        String normalized = text.toLowerCase();
+
+        for (Map.Entry<String, String> entry : SKILL_ALIASES.entrySet()) {
+
+            normalized = normalized.replace(
+                    entry.getKey().toLowerCase(),
+                    entry.getValue().toLowerCase()
+            );
+        }
+
+        return normalized;
+    }
+
+    // Extract Skills
     public String extractSkills(String resumeText) {
 
-        StringBuilder extractedSkills = new StringBuilder();
+        String normalizedText = normalizeText(resumeText);
+
+        Set<String> extractedSkills = new LinkedHashSet<>();
 
         for (String skill : PREDEFINED_SKILLS) {
 
-            if (resumeText.toLowerCase().contains(skill.toLowerCase())) {
+            Pattern pattern = Pattern.compile(
+                    "\\b" + Pattern.quote(skill.toLowerCase()) + "\\b",
+                    Pattern.CASE_INSENSITIVE
+            );
 
-                extractedSkills.append(skill).append(", ");
+            Matcher matcher = pattern.matcher(normalizedText);
 
+            if (matcher.find()) {
+                extractedSkills.add(skill);
             }
-
         }
 
-        if (extractedSkills.length() > 0) {
-
-            extractedSkills.setLength(extractedSkills.length() - 2);
-
-        }
-
-        return extractedSkills.toString();
-
+        return String.join(", ", extractedSkills);
     }
-
 }
