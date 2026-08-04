@@ -1,6 +1,7 @@
 package com.aiResumeApplication.ai_resume_system.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Job {
@@ -9,15 +10,20 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Job title is required")
     private String title;
 
+    @NotBlank(message = "Company name is required")
     private String company;
 
+    @NotBlank(message = "Location is required")
     private String location;
 
+    @NotBlank(message = "Description is required")
     @Column(length = 2000)
     private String description;
 
+    @NotBlank(message = "Required skills are mandatory")
     private String requiredSkills;
 
     // Getters and Setters
