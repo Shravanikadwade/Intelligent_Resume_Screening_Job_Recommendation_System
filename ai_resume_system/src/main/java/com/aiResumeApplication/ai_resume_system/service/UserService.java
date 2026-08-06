@@ -29,10 +29,22 @@ public class UserService {
 
     public LoginResponse loginUser(LoginRequest loginRequest) {
 
+
+
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+
+
+        boolean matches = passwordEncoder.matches(
+                loginRequest.getPassword(),
+                user.getPassword()
+        );
+
+        System.out.println("Password Matches : " + matches);
+
+
+        if (matches) {
 
             String token = jwtService.generateToken(user.getEmail());
 
